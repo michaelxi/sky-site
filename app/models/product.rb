@@ -6,5 +6,18 @@ class Product < ActiveRecord::Base
     :with => %r{\.(gif|jpg|png)}i,
     :message => 'must be a url for gif, jpg or png image.'
   }
+  default_scope :order => "title"
   
+  has_many :line_items
+  
+  before_destroy :ensure_not_reference_by_any_line_item
+  
+  def ensure_not_reference_by_any_line_item
+    if line_item.size.zero?
+      return true
+    else
+      error[:base] << 'line item present'
+      return false
+    end
+  end
 end
